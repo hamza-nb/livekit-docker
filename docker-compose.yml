@@ -23,20 +23,6 @@ services:
       - redis_server_volume:/data
     restart: on-failure
 
-  egress-server:
-     container_name: egress-server
-     depends_on:
-       - redis-server
-       - livekit-server
-     image: "livekit/egress"
-     environment:
-       - EGRESS_CONFIG_FILE=/data/egress-config.yaml
-     volumes:
-       - ./egress-config.yaml:/data/egress-config.yaml
-       - egress_server_volume:/data
-     restart: on-failure
-
 volumes:
   livekit_server_volume:
   redis_server_volume:
-  egress_server_volume:
