@@ -1,0 +1,42 @@
+services:
+  livekit-server:
+    container_name: livekit-server
+    depends_on:
+      - redis-server
+    command: --config /opt/livekit-config.yaml
+    image: "livekit/livekit-server"
+    volumes:
+      - ./livekit-config.yaml:/opt/livekit-config.yaml
+      - livekit_server_volume:/opt
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    restart: on-failure
+
+  redis-server:
+    container_name: redis-server
+    image: "redis:latest"
+    command: redis-server /data/redis.conf
+    volumes:
+      - ./redis.conf:/data/redis.conf
+      - redis_server_volume:/data
+    restart: on-failure
+
+  egress-server:
+     container_name: egress-server
+     depends_on:
+       - redis-server
+       - livekit-server
+     image: "livekit/egress"
+     environment:
+       - EGRESS_CONFIG_FILE=/data/egress-config.yaml
+     volumes:
+       - ./egress-config.yaml:/data/egress-config.yaml
+       - egress_server_volume:/data
+     restart: on-failure
+
+volumes:
+  livekit_server_volume:
+  redis_server_volume:
+  egress_server_volume:
